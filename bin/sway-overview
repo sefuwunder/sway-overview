@@ -1,0 +1,20 @@
+#!/bin/sh
+# sway-overview launcher — toggles the overlay (Super key behavior:
+# press once to open, press again to close).
+HERE="$(dirname "$(readlink -f "$0")")"
+PIDFILE="${XDG_RUNTIME_DIR:-/tmp}/sway-overview.pid"
+
+if [ -f "$PIDFILE" ]; then
+  OLD="$(cat "$PIDFILE")"
+  if kill -0 "$OLD" 2>/dev/null; then
+    kill "$OLD" 2>/dev/null
+    rm -f "$PIDFILE"
+    exit 0
+  fi
+  rm -f "$PIDFILE"
+fi
+
+python3 "$HERE/../src/overview.py" &
+echo $! > "$PIDFILE"
+wait $!
+rm -f "$PIDFILE"
